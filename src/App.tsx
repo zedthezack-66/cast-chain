@@ -8,6 +8,8 @@ import { store } from '@/store';
 import { setupEventListeners } from '@/services/blockchain';
 import Index from "./pages/Index";
 import PollDetails from "./pages/PollDetails";
+import VoterDashboard from "./pages/VoterDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import { useEffect } from 'react';
 
@@ -23,6 +25,8 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/polls/:id" element={<PollDetails />} />
+        <Route path="/voter-dashboard" element={<VoterDashboard />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
