@@ -5,12 +5,12 @@ export interface PollStruct {
   image: string;
   title: string;
   description: string;
-  totalVotes: number;
-  totalContestants: number;
+  voteCount: number;
+  contestantCount: number;
   deleted: boolean;
   director: string;
-  startTime: number;
-  endTime: number;
+  startsAt: number;
+  endsAt: number;
   createdAt: number;
 }
 
@@ -18,9 +18,8 @@ export interface ContestantStruct {
   id: number;
   image: string;
   name: string;
-  voter: string;
+  account: string;
   votes: number;
-  voters: string[];
 }
 
 export interface WalletState {
@@ -63,12 +62,17 @@ export interface CreatePollData {
   image: string;
   title: string;
   description: string;
-  startTime: Date;
-  endTime: Date;
+  startsAt: Date;
+  endsAt: Date;
 }
 
-export interface UpdatePollData extends CreatePollData {
+export interface UpdatePollData {
   id: number;
+  image: string;
+  title: string;
+  description: string;
+  startsAt: Date;
+  endsAt: Date;
 }
 
 export interface ContestData {

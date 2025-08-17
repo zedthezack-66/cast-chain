@@ -9,9 +9,9 @@ interface PollDetailsCardProps {
 
 const PollDetailsCard = ({ poll }: PollDetailsCardProps) => {
   const now = Math.floor(Date.now() / 1000);
-  const isActive = now >= poll.startTime && now <= poll.endTime && !poll.deleted;
-  const hasStarted = now >= poll.startTime;
-  const hasEnded = now > poll.endTime;
+  const isActive = now >= poll.startsAt && now <= poll.endsAt && !poll.deleted;
+  const hasStarted = now >= poll.startsAt;
+  const hasEnded = now > poll.endsAt;
 
   const getStatusBadge = () => {
     if (poll.deleted) {
@@ -101,13 +101,13 @@ const PollDetailsCard = ({ poll }: PollDetailsCardProps) => {
             <div>
               <p className="text-sm text-muted-foreground mb-1">Starts</p>
               <p className="font-medium">
-                {new Date(poll.startTime * 1000).toLocaleString()}
+                {new Date(poll.startsAt * 1000).toLocaleString()}
               </p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground mb-1">Ends</p>
               <p className="font-medium">
-                {new Date(poll.endTime * 1000).toLocaleString()}
+                {new Date(poll.endsAt * 1000).toLocaleString()}
               </p>
             </div>
           </div>

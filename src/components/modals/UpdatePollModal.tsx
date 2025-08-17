@@ -34,8 +34,8 @@ const UpdatePollModal = () => {
         image: selectedPoll.image,
         title: selectedPoll.title,
         description: selectedPoll.description,
-        startTime: new Date(selectedPoll.startTime * 1000).toISOString().slice(0, 16),
-        endTime: new Date(selectedPoll.endTime * 1000).toISOString().slice(0, 16)
+        startTime: new Date(selectedPoll.startsAt * 1000).toISOString().slice(0, 16),
+        endTime: new Date(selectedPoll.endsAt * 1000).toISOString().slice(0, 16)
       });
     }
   }, [selectedPoll]);
@@ -63,8 +63,8 @@ const UpdatePollModal = () => {
         image: formData.image.trim(),
         title: formData.title.trim(),
         description: formData.description.trim(),
-        startTime,
-        endTime
+        startsAt: startTime,
+        endsAt: endTime
       });
 
       toast({

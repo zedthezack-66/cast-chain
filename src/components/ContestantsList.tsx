@@ -141,9 +141,9 @@ const ContestantsList = ({ pollId, contestants, isActive }: ContestantsListProps
                     <h3 className="font-semibold text-lg mb-1 truncate">
                       {contestant.name}
                     </h3>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      by {contestant.voter.slice(0, 6)}...{contestant.voter.slice(-4)}
-                    </p>
+                     <p className="text-sm text-muted-foreground mb-2">
+                       by {contestant.account.slice(0, 6)}...{contestant.account.slice(-4)}
+                     </p>
                     
                     {/* Vote Count */}
                     <div className="flex items-center gap-2 mb-3">

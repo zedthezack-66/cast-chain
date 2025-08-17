@@ -67,7 +67,7 @@ const DeletePollModal = () => {
                 {selectedPoll.description}
               </p>
               <div className="mt-2 text-xs text-muted-foreground">
-                {selectedPoll.totalVotes} votes • {selectedPoll.totalContestants} contestants
+                {selectedPoll.voteCount} votes • {selectedPoll.contestantCount} contestants
               </div>
             </div>
           )}

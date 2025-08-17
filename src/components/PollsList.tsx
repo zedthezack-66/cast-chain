@@ -45,8 +45,8 @@ const PollsList = () => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {polls.map((poll) => {
         const now = Math.floor(Date.now() / 1000);
-        const isActive = now >= poll.startTime && now <= poll.endTime && !poll.deleted;
-        const hasEnded = now > poll.endTime;
+        const isActive = now >= poll.startsAt && now <= poll.endsAt && !poll.deleted;
+        const hasEnded = now > poll.endsAt;
 
         return (
           <Card key={poll.id} className="voting-card overflow-hidden">
@@ -90,18 +90,18 @@ const PollsList = () => {
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-1">
                   <Vote className="w-4 h-4" />
-                  <span>{poll.totalVotes} votes</span>
+                  <span>{poll.voteCount} votes</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Users className="w-4 h-4" />
-                  <span>{poll.totalContestants} contestants</span>
+                  <span>{poll.contestantCount} contestants</span>
                 </div>
               </div>
 
               <div className="text-xs text-muted-foreground">
                 <div className="flex items-center gap-1 mb-1">
                   <Clock className="w-3 h-3" />
-                  <span>Ends: {new Date(poll.endTime * 1000).toLocaleDateString()}</span>
+                  <span>Ends: {new Date(poll.endsAt * 1000).toLocaleDateString()}</span>
                 </div>
               </div>
             </CardContent>

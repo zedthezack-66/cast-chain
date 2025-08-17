@@ -164,12 +164,12 @@ const formatPoll = (poll: any): PollStruct => ({
   image: poll.image,
   title: poll.title,
   description: poll.description,
-  totalVotes: Number(poll.totalVotes),
-  totalContestants: Number(poll.totalContestants),
+  voteCount: Number(poll.voteCount),
+  contestantCount: Number(poll.contestantCount),
   deleted: poll.deleted,
   director: poll.director,
-  startTime: Number(poll.startTime),
-  endTime: Number(poll.endTime),
+  startsAt: Number(poll.startsAt),
+  endsAt: Number(poll.endsAt),
   createdAt: Number(poll.createdAt)
 });
 
@@ -178,25 +178,24 @@ const formatContestant = (contestant: any): ContestantStruct => ({
   id: Number(contestant.id),
   image: contestant.image,
   name: contestant.name,
-  voter: contestant.voter,
-  votes: Number(contestant.votes),
-  voters: contestant.voters
+  account: contestant.account,
+  votes: Number(contestant.votes)
 });
 
 // Contract interaction functions
 export const createPoll = async (data: CreatePollData): Promise<void> => {
   const contractWithSigner = await getContractWithSigner();
   
-  const startTime = Math.floor(data.startTime.getTime() / 1000);
-  const endTime = Math.floor(data.endTime.getTime() / 1000);
+  const startsAt = Math.floor(data.startsAt.getTime() / 1000);
+  const endsAt = Math.floor(data.endsAt.getTime() / 1000);
   
   const receipt = await handleTransaction(
     contractWithSigner.createPoll(
       data.image,
       data.title,
       data.description,
-      startTime,
-      endTime
+      startsAt,
+      endsAt
     )
   );
   
@@ -207,8 +206,8 @@ export const createPoll = async (data: CreatePollData): Promise<void> => {
 export const updatePoll = async (data: UpdatePollData): Promise<void> => {
   const contractWithSigner = await getContractWithSigner();
   
-  const startTime = Math.floor(data.startTime.getTime() / 1000);
-  const endTime = Math.floor(data.endTime.getTime() / 1000);
+  const startsAt = Math.floor(data.startsAt.getTime() / 1000);
+  const endsAt = Math.floor(data.endsAt.getTime() / 1000);
   
   await handleTransaction(
     contractWithSigner.updatePoll(
@@ -216,8 +215,8 @@ export const updatePoll = async (data: UpdatePollData): Promise<void> => {
       data.image,
       data.title,
       data.description,
-      startTime,
-      endTime
+      startsAt,
+      endsAt
     )
   );
   
@@ -240,7 +239,7 @@ export const contest = async (data: ContestData): Promise<void> => {
   const contractWithSigner = await getContractWithSigner();
   
   await handleTransaction(
-    contractWithSigner.contest(data.pollId, data.image, data.name)
+    contractWithSigner.contest(data.pollId, data.name, data.image)
   );
   
   // Refresh contestants
@@ -308,7 +307,7 @@ export const hasUserVoted = async (pollId: number, userAddress: string): Promise
     if (!contract) await initializeProvider();
     if (!contract) throw new Error('Contract not initialized');
     
-    return await contract.hasAddressVoted(pollId, userAddress);
+    return await contract.hasUserVoted(pollId, userAddress);
   } catch (error: any) {
     console.error('Failed to check vote status:', error);
     return false;

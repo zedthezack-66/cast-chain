@@ -45,8 +45,8 @@ const CreatePollModal = () => {
         image: formData.image.trim(),
         title: formData.title.trim(),
         description: formData.description.trim(),
-        startTime,
-        endTime
+        startsAt: startTime,
+        endsAt: endTime
       });
 
       toast({

@@ -53,9 +53,9 @@ const PollDetails = () => {
 
   const isDirector = account && currentPoll?.director.toLowerCase() === account.toLowerCase();
   const now = Math.floor(Date.now() / 1000);
-  const isActive = currentPoll && now >= currentPoll.startTime && now <= currentPoll.endTime && !currentPoll.deleted;
-  const hasStarted = currentPoll && now >= currentPoll.startTime;
-  const hasEnded = currentPoll && now > currentPoll.endTime;
+  const isActive = currentPoll && now >= currentPoll.startsAt && now <= currentPoll.endsAt && !currentPoll.deleted;
+  const hasStarted = currentPoll && now >= currentPoll.startsAt;
+  const hasEnded = currentPoll && now > currentPoll.endsAt;
 
   return (
     <div className="min-h-screen bg-background">
@@ -136,11 +136,11 @@ const PollDetails = () => {
                 <CardContent className="space-y-4">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Total Votes:</span>
-                    <Badge variant="secondary">{currentPoll.totalVotes}</Badge>
+                    <Badge variant="secondary">{currentPoll.voteCount}</Badge>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Contestants:</span>
-                    <Badge variant="secondary">{currentPoll.totalContestants}</Badge>
+                    <Badge variant="secondary">{currentPoll.contestantCount}</Badge>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Status:</span>
@@ -178,13 +178,13 @@ const PollDetails = () => {
                   <div>
                     <p className="text-sm text-muted-foreground">Starts</p>
                     <p className="font-medium">
-                      {new Date(currentPoll.startTime * 1000).toLocaleString()}
+                      {new Date(currentPoll.startsAt * 1000).toLocaleString()}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Ends</p>
                     <p className="font-medium">
-                      {new Date(currentPoll.endTime * 1000).toLocaleString()}
+                      {new Date(currentPoll.endsAt * 1000).toLocaleString()}
                     </p>
                   </div>
                 </CardContent>
