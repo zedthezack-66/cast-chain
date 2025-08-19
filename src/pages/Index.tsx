@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Users, Shield, Fingerprint, Zap, Lock, Globe } from 'lucide-react';
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
-import { BiometricAuth } from '@/components/BiometricAuth';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import BiometricAuth from '@/components/BiometricAuth';
 import { PollGrid } from '@/components/polls/PollGrid';
 import { VotingStatsCards } from '@/components/stats/VotingStatsCards';
 import CreatePollModal from '@/components/modals/CreatePollModal';
@@ -22,7 +22,7 @@ const Index = () => {
 
   const handleAuthComplete = () => {
     setShowAuth(false);
-    navigate(authRole === 'voter' ? '/voter-dashboard' : '/admin-dashboard');
+    // Navigation is handled internally by BiometricAuth component
   };
 
   // Mock stats data
@@ -37,8 +37,7 @@ const Index = () => {
     return (
       <BiometricAuth
         role={authRole}
-        onAuthComplete={handleAuthComplete}
-        onCancel={() => setShowAuth(false)}
+        onAuth={handleAuthComplete}
       />
     );
   }
