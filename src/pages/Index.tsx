@@ -2,12 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, Shield, Fingerprint, Zap, Lock, Globe } from 'lucide-react';
+import { Users, Shield, Fingerprint } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import BiometricAuth from '@/components/BiometricAuth';
-import { PollGrid } from '@/components/polls/PollGrid';
-import { VotingStatsCards } from '@/components/stats/VotingStatsCards';
 import CreatePollModal from '@/components/modals/CreatePollModal';
 
 const Index = () => {
@@ -23,14 +21,6 @@ const Index = () => {
   const handleAuthComplete = () => {
     setShowAuth(false);
     // Navigation is handled internally by BiometricAuth component
-  };
-
-  // Mock stats data
-  const mockStats = {
-    activePolls: 12,
-    totalVotes: 2847,
-    totalVoters: 1456,
-    verificationRate: 100
   };
 
   if (showAuth) {
@@ -99,23 +89,62 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 border-t border-border/50">
+      {/* Instructions Section */}
+      <section className="py-16">
         <div className="container mx-auto px-4">
-          <VotingStatsCards stats={mockStats} />
-        </div>
-      </section>
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Voter Instructions */}
+            <Card className="glass-card p-8">
+              <div className="text-center mb-6">
+                <Users className="w-12 h-12 text-primary mx-auto mb-4" />
+                <h3 className="text-2xl font-bold mb-2">For Voters</h3>
+              </div>
+              <div className="space-y-4 text-left">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-sm font-semibold text-primary mt-0.5">1</div>
+                  <p className="text-muted-foreground">Connect your MetaMask wallet to the Hardhat network</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-sm font-semibold text-primary mt-0.5">2</div>
+                  <p className="text-muted-foreground">Browse active polls and view contestant details</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-sm font-semibold text-primary mt-0.5">3</div>
+                  <p className="text-muted-foreground">Cast your vote securely on the blockchain</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-sm font-semibold text-primary mt-0.5">4</div>
+                  <p className="text-muted-foreground">View real-time results and participate in democracy</p>
+                </div>
+              </div>
+            </Card>
 
-      {/* Active Polls Section */}
-      <section id="polls" className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Active Polls</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Participate in ongoing polls or explore results
-            </p>
+            {/* Admin Instructions */}
+            <Card className="glass-card p-8">
+              <div className="text-center mb-6">
+                <Shield className="w-12 h-12 text-secondary mx-auto mb-4" />
+                <h3 className="text-2xl font-bold mb-2">For Administrators</h3>
+              </div>
+              <div className="space-y-4 text-left">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-secondary/20 flex items-center justify-center text-sm font-semibold text-secondary mt-0.5">1</div>
+                  <p className="text-muted-foreground">Connect your admin wallet to access poll management</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-secondary/20 flex items-center justify-center text-sm font-semibold text-secondary mt-0.5">2</div>
+                  <p className="text-muted-foreground">Create new polls with custom settings and timeframes</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-secondary/20 flex items-center justify-center text-sm font-semibold text-secondary mt-0.5">3</div>
+                  <p className="text-muted-foreground">Add contestants to your polls before voting begins</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-secondary/20 flex items-center justify-center text-sm font-semibold text-secondary mt-0.5">4</div>
+                  <p className="text-muted-foreground">Monitor platform analytics and manage poll lifecycle</p>
+                </div>
+              </div>
+            </Card>
           </div>
-          <PollGrid />
         </div>
       </section>
 

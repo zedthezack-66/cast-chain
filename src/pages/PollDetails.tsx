@@ -13,7 +13,7 @@ import PollDetailsCard from '@/components/PollDetailsCard';
 import ContestantsList from '@/components/ContestantsList';
 import UpdatePollModal from '@/components/modals/UpdatePollModal';
 import DeletePollModal from '@/components/modals/DeletePollModal';
-import ContestModal from '@/components/modals/ContestModal';
+import AddContestantModal from '@/components/modals/AddContestantModal';
 import Footer from '@/components/Footer';
 
 const PollDetails = () => {
@@ -97,6 +97,14 @@ const PollDetails = () => {
                       Update Poll
                     </Button>
                     <Button
+                      onClick={() => dispatch(openContest(currentPoll.id))}
+                      variant="secondary"
+                      className="flex-1"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Contestant
+                    </Button>
+                    <Button
                       onClick={() => dispatch(openDeletePoll(currentPoll.id))}
                       variant="destructive"
                       className="flex-1"
@@ -108,20 +116,6 @@ const PollDetails = () => {
                 </Card>
               )}
 
-              {/* Contest Button */}
-              {account && isActive && (
-                <Card className="voting-card">
-                  <CardContent className="pt-6">
-                    <Button
-                      onClick={() => dispatch(openContest(currentPoll.id))}
-                      className="w-full web3-button gradient-primary"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Join as Contestant
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
             </div>
 
             {/* Poll Stats & Status */}
@@ -206,7 +200,7 @@ const PollDetails = () => {
       {/* Modals */}
       <UpdatePollModal />
       <DeletePollModal />
-      <ContestModal />
+      <AddContestantModal />
       
       <Footer />
     </div>

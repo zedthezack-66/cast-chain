@@ -10,24 +10,36 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 
-const ContestModal = () => {
+const AddContestantModal = () => {
   const dispatch = useDispatch();
   const { toast } = useToast();
   const { contest: isOpen, selectedPollId } = useSelector((state: RootState) => state.modals);
   const { polls } = useSelector((state: RootState) => state.polls);
   const { loading: txLoading } = useSelector((state: RootState) => state.transaction);
+  const { account } = useSelector((state: RootState) => state.wallet);
 
   const selectedPoll = polls.find(poll => poll.id === selectedPollId);
 
   const [formData, setFormData] = useState({
     image: '',
-    name: ''
+    name: '',
+    walletAddress: ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!selectedPollId) return;
+
+    // Check if user is poll director (admin)
+    if (!account || !selectedPoll || selectedPoll.director.toLowerCase() !== account.toLowerCase()) {
+      toast({
+        title: "Access Denied",
+        description: "Only the poll director can add contestants",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       await contest({
@@ -37,15 +49,15 @@ const ContestModal = () => {
       });
 
       toast({
-        title: "Joined as Contestant",
-        description: "You have successfully joined the poll as a contestant",
+        title: "Contestant Added",
+        description: "Contestant has been successfully added to the poll",
       });
 
-      setFormData({ image: '', name: '' });
+      setFormData({ image: '', name: '', walletAddress: '' });
       dispatch(closeContest());
     } catch (error: any) {
       toast({
-        title: "Failed to Join",
+        title: "Failed to Add Contestant",
         description: error.message,
         variant: "destructive",
       });
@@ -53,7 +65,7 @@ const ContestModal = () => {
   };
 
   const handleClose = () => {
-    setFormData({ image: '', name: '' });
+    setFormData({ image: '', name: '', walletAddress: '' });
     dispatch(closeContest());
   };
 
@@ -63,7 +75,7 @@ const ContestModal = () => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Users className="w-5 h-5" />
-            Join as Contestant
+            Add Contestant
           </DialogTitle>
         </DialogHeader>
 
@@ -133,7 +145,7 @@ const ContestModal = () => {
               disabled={txLoading || !formData.name.trim()}
               className="flex-1 web3-button gradient-primary"
             >
-              {txLoading ? 'Joining...' : 'Join Contest'}
+              {txLoading ? 'Adding...' : 'Add Contestant'}
             </Button>
             <Button
               type="button"
@@ -150,4 +162,4 @@ const ContestModal = () => {
   );
 };
 
-export default ContestModal;
+export default AddContestantModal;

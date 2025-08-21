@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useState, useEffect } from 'react';
 import { RootState } from '@/store';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Shield, Plus, Settings, BarChart3, Users, Zap, TrendingUp } from 'lucide-react';
@@ -7,6 +8,7 @@ import { openCreatePoll } from '@/store/slices/modalsSlice';
 import { ConnectWallet } from '@/components/shared/ConnectWallet';
 import { PollGrid } from '@/components/polls/PollGrid';
 import { VotingStatsCards } from '@/components/stats/VotingStatsCards';
+import { getRealPlatformStats } from '@/services/blockchain';
 import CreatePollModal from '@/components/modals/CreatePollModal';
 import UpdatePollModal from '@/components/modals/UpdatePollModal';
 import DeletePollModal from '@/components/modals/DeletePollModal';
@@ -20,13 +22,27 @@ const AdminDashboard = () => {
     dispatch(openCreatePoll());
   };
 
-  // Mock admin stats - in real app this would come from admin analytics
-  const adminStats = {
-    activePolls: 12,
-    totalVotes: 2847,
-    totalVoters: 1456,
+  // Load real platform stats
+  useEffect(() => {
+    const loadStats = async () => {
+      const stats = await getRealPlatformStats();
+      setAdminStats(stats);
+    };
+    
+    if (account) {
+      loadStats();
+      // Refresh stats every 30 seconds
+      const interval = setInterval(loadStats, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [account]);
+
+  const [adminStats, setAdminStats] = useState({
+    activePolls: 0,
+    totalVotes: 0,
+    totalVoters: 0,
     verificationRate: 100
-  };
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -57,15 +73,6 @@ const AdminDashboard = () => {
             
             <div className="flex items-center gap-3">
               <ConnectWallet />
-              {account && (
-                <Button
-                  onClick={handleCreatePoll}
-                  className="gradient-secondary web3-button"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Poll
-                </Button>
-              )}
             </div>
           </div>
         </div>
@@ -110,14 +117,6 @@ const AdminDashboard = () => {
                       <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
                       <span className="text-muted-foreground">Admin Access</span>
                     </div>
-                    <Button
-                      onClick={handleCreatePoll}
-                      size="sm"
-                      className="gradient-secondary web3-button"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Quick Create
-                    </Button>
                   </div>
                 </div>
               </div>

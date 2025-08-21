@@ -82,15 +82,6 @@ const Navbar = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-4">
-            {isConnected && (
-              <Button
-                onClick={() => dispatch(openCreatePoll())}
-                className="web3-button gradient-primary hidden sm:flex"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Create Poll
-              </Button>
-            )}
 
             {!isConnected ? (
               <Button 
@@ -135,10 +126,6 @@ const Navbar = () => {
                     </>
                   )}
                   
-                  <DropdownMenuItem onClick={() => dispatch(openCreatePoll())} className="sm:hidden">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create Poll
-                  </DropdownMenuItem>
                   
                   <DropdownMenuItem onClick={handleDisconnect}>
                     <LogOut className="w-4 h-4 mr-2" />
