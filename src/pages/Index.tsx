@@ -59,7 +59,7 @@ const Index = () => {
 
             {/* Role Selection Cards */}
             <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto mb-16">
-              <Card className="poll-card group cursor-pointer" onClick={() => handleRoleSelect('voter')}>
+              <Card className="poll-card group cursor-pointer" onClick={() => navigate('/voter')}>
                 <CardContent className="p-8 text-center">
                   <div className="gradient-primary p-4 rounded-full w-16 h-16 mx-auto mb-4">
                     <Users className="w-8 h-8 text-primary-foreground" />
@@ -72,7 +72,7 @@ const Index = () => {
                 </CardContent>
               </Card>
 
-              <Card className="poll-card group cursor-pointer" onClick={() => handleRoleSelect('admin')}>
+              <Card className="poll-card group cursor-pointer" onClick={() => navigate('/admin')}>
                 <CardContent className="p-8 text-center">
                   <div className="gradient-secondary p-4 rounded-full w-16 h-16 mx-auto mb-4">
                     <Shield className="w-8 h-8 text-primary-foreground" />
