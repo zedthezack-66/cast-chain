@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Fingerprint, User, Shield, Loader2 } from 'lucide-react';
+import { connectWallet } from '@/services/blockchain';
+import { useToast } from '@/hooks/use-toast';
 
 interface BiometricAuthProps {
   role: 'voter' | 'admin';
@@ -12,21 +14,36 @@ interface BiometricAuthProps {
 const BiometricAuth = ({ role, onAuth }: BiometricAuthProps) => {
   const [isScanning, setIsScanning] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleScan = async () => {
     setIsScanning(true);
     
-    // Simulate fingerprint scanning
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsScanning(false);
-    onAuth();
-    
-    // Navigate to appropriate dashboard
-    if (role === 'voter') {
-      navigate('/voter-dashboard');
-    } else {
-      navigate('/admin-dashboard');
+    try {
+      // Simulate fingerprint scanning
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // For voters, trigger MetaMask account selection
+      if (role === 'voter') {
+        await connectWallet(); // This will show MetaMask account selection
+        navigate('/voter');
+      }
+      
+      setIsScanning(false);
+      onAuth();
+      
+      toast({
+        title: "Authentication Successful",
+        description: `Welcome ${role}! Wallet connected successfully.`,
+      });
+      
+    } catch (error: any) {
+      setIsScanning(false);
+      toast({
+        title: "Authentication Failed",
+        description: error.message || "Failed to authenticate. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 

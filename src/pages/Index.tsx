@@ -14,8 +14,14 @@ const Index = () => {
   const [authRole, setAuthRole] = useState<'voter' | 'admin'>('voter');
 
   const handleRoleSelect = (role: 'voter' | 'admin') => {
-    setAuthRole(role);
-    setShowAuth(true);
+    if (role === 'admin') {
+      // Admin goes directly to admin dashboard - auto-connect handled by RoleBasedRoute
+      navigate('/admin');
+    } else {
+      // Voter goes to biometric auth for wallet selection
+      setAuthRole(role);
+      setShowAuth(true);
+    }
   };
 
   const handleAuthComplete = () => {
@@ -25,10 +31,12 @@ const Index = () => {
 
   if (showAuth) {
     return (
-      <BiometricAuth
-        role={authRole}
-        onAuth={handleAuthComplete}
-      />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <BiometricAuth
+          role={authRole}
+          onAuth={handleAuthComplete}
+        />
+      </div>
     );
   }
 

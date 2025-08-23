@@ -22,7 +22,7 @@ const RoleBasedRoute = ({ children, role }: RoleBasedRouteProps) => {
       const isAdminRoute = location.pathname.startsWith('/admin');
       const isVoterRoute = location.pathname.startsWith('/voter');
 
-      // Disconnect if switching between admin/voter routes
+      // Disconnect if switching between admin/voter routes with wrong role
       if (isConnected) {
         if ((isAdmin && isVoterRoute) || (!isAdmin && isAdminRoute)) {
           disconnectWallet();
@@ -30,7 +30,7 @@ const RoleBasedRoute = ({ children, role }: RoleBasedRouteProps) => {
         }
       }
 
-      // Auto-connect admin on admin routes
+      // Auto-connect admin on admin routes (first deployed account)
       if (isAdminRoute && !isConnected) {
         try {
           await connectAdminWallet();
@@ -38,6 +38,9 @@ const RoleBasedRoute = ({ children, role }: RoleBasedRouteProps) => {
           console.error('Failed to connect admin:', error);
         }
       }
+
+      // For voter routes, don't auto-connect - let BiometricAuth handle it
+      // This ensures voters get to choose their account through MetaMask selection
     };
 
     handleRoleBasedConnection();
@@ -49,6 +52,7 @@ const RoleBasedRoute = ({ children, role }: RoleBasedRouteProps) => {
       const isAdminRoute = location.pathname.startsWith('/admin');
       const isVoterRoute = location.pathname.startsWith('/voter');
       
+      // Disconnect when leaving admin or voter routes completely
       if (!isAdminRoute && !isVoterRoute && isConnected) {
         disconnectWallet();
       }
@@ -86,7 +90,7 @@ const RoleBasedRoute = ({ children, role }: RoleBasedRouteProps) => {
     const isVoterRoute = location.pathname.startsWith('/voter');
     if (!isVoterRoute) return null;
 
-    // Check if voter is trying to access admin functions
+    // Check if admin is trying to access voter functions
     if (isConnected && isAdmin) {
       return (
         <div className="min-h-screen bg-background flex items-center justify-center">
@@ -111,6 +115,9 @@ const RoleBasedRoute = ({ children, role }: RoleBasedRouteProps) => {
         </div>
       );
     }
+
+    // For voter routes, allow access even if not connected - they'll connect via BiometricAuth
+    // This enables the proper flow: Home -> BiometricAuth -> Wallet Selection -> Voter Dashboard
   }
 
   return <>{children}</>;

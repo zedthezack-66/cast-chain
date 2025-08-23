@@ -52,7 +52,7 @@ export const isMetaMaskInstalled = (): boolean => {
   return typeof window !== 'undefined' && window.ethereum && window.ethereum.isMetaMask;
 };
 
-// Connect wallet
+// Connect wallet (for voters - allows account selection)
 export const connectWallet = async (): Promise<void> => {
   if (!isMetaMaskInstalled()) {
     throw new Error('MetaMask is not installed');
@@ -64,9 +64,17 @@ export const connectWallet = async (): Promise<void> => {
 
     if (!provider) throw new Error('Provider not initialized');
 
+    // First disconnect any existing connection to ensure fresh selection
+    try {
+      await provider.send('wallet_revokePermissions', [{ eth_accounts: {} }]);
+    } catch (e) {
+      // Ignore if permissions don't exist
+    }
+
     // Request permissions to show account selection dialog
     await provider.send('wallet_requestPermissions', [{ eth_accounts: {} }]);
     
+    // Now request accounts - this will show the selection dialog
     const accounts = await provider.send('eth_requestAccounts', []);
     const network = await provider.getNetwork();
     const chainId = Number(network.chainId);
@@ -76,7 +84,7 @@ export const connectWallet = async (): Promise<void> => {
     }
 
     store.dispatch(setWalletConnected({
-      account: accounts[0],
+      account: accounts[0], // User selected account
       chainId,
       isAdmin: false
     }));
