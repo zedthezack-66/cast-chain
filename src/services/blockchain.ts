@@ -52,7 +52,7 @@ export const isMetaMaskInstalled = (): boolean => {
   return typeof window !== 'undefined' && window.ethereum && window.ethereum.isMetaMask;
 };
 
-// Connect wallet (for voters - allows account selection)
+// Connect wallet
 export const connectWallet = async (): Promise<void> => {
   if (!isMetaMaskInstalled()) {
     throw new Error('MetaMask is not installed');
@@ -64,17 +64,9 @@ export const connectWallet = async (): Promise<void> => {
 
     if (!provider) throw new Error('Provider not initialized');
 
-    // First disconnect any existing connection to ensure fresh selection
-    try {
-      await provider.send('wallet_revokePermissions', [{ eth_accounts: {} }]);
-    } catch (e) {
-      // Ignore if permissions don't exist
-    }
-
     // Request permissions to show account selection dialog
     await provider.send('wallet_requestPermissions', [{ eth_accounts: {} }]);
     
-    // Now request accounts - this will show the selection dialog
     const accounts = await provider.send('eth_requestAccounts', []);
     const network = await provider.getNetwork();
     const chainId = Number(network.chainId);
@@ -84,9 +76,8 @@ export const connectWallet = async (): Promise<void> => {
     }
 
     store.dispatch(setWalletConnected({
-      account: accounts[0], // User selected account
-      chainId,
-      isAdmin: false
+      account: accounts[0],
+      chainId
     }));
 
     // Check if we're on the correct network
@@ -96,49 +87,6 @@ export const connectWallet = async (): Promise<void> => {
   } catch (error: any) {
     store.dispatch(setWalletDisconnected());
     throw new Error(error.message || 'Failed to connect wallet');
-  }
-};
-
-// Connect admin wallet (auto-connects to first account)
-export const connectAdminWallet = async (): Promise<void> => {
-  if (!isMetaMaskInstalled()) {
-    throw new Error('MetaMask is not installed');
-  }
-
-  try {
-    store.dispatch(setConnecting(true));
-    await initializeProvider();
-
-    if (!provider) throw new Error('Provider not initialized');
-
-    // Get existing accounts or request if none
-    let accounts = await provider.send('eth_accounts', []);
-    
-    if (accounts.length === 0) {
-      accounts = await provider.send('eth_requestAccounts', []);
-    }
-
-    const network = await provider.getNetwork();
-    const chainId = Number(network.chainId);
-
-    if (accounts.length === 0) {
-      throw new Error('No accounts found');
-    }
-
-    // Always use first account for admin
-    store.dispatch(setWalletConnected({
-      account: accounts[0],
-      chainId,
-      isAdmin: true
-    }));
-
-    // Check if we're on the correct network
-    if (chainId !== HARDHAT_CHAIN_ID) {
-      await switchToHardhatNetwork();
-    }
-  } catch (error: any) {
-    store.dispatch(setWalletDisconnected());
-    throw new Error(error.message || 'Failed to connect admin wallet');
   }
 };
 
@@ -495,8 +443,7 @@ export const setupEventListeners = (): void => {
         if (state.wallet.chainId) {
           store.dispatch(setWalletConnected({
             account: accounts[0],
-            chainId: state.wallet.chainId,
-            isAdmin: state.wallet.isAdmin
+            chainId: state.wallet.chainId
           }));
         }
       }

@@ -6,7 +6,6 @@ import { ArrowLeft, Vote, Users, Zap, Clock } from 'lucide-react';
 import { ConnectWallet } from '@/components/shared/ConnectWallet';
 import { PollGrid } from '@/components/polls/PollGrid';
 import { VotingStatsCards } from '@/components/stats/VotingStatsCards';
-import RoleBasedRoute from '@/components/shared/RoleBasedRoute';
 
 const VoterDashboard = () => {
   const navigate = useNavigate();
@@ -21,8 +20,7 @@ const VoterDashboard = () => {
   };
 
   return (
-    <RoleBasedRoute role="voter">
-      <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -123,9 +121,8 @@ const VoterDashboard = () => {
             </section>
           </div>
         )}
-        </main>
-      </div>
-    </RoleBasedRoute>
+      </main>
+    </div>
   );
 };
 

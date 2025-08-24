@@ -27,7 +27,6 @@ export interface WalletState {
   chainId: number | null;
   isConnected: boolean;
   isConnecting: boolean;
-  isAdmin: boolean;
 }
 
 export interface PollsState {

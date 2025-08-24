@@ -12,7 +12,6 @@ import { getRealPlatformStats } from '@/services/blockchain';
 import CreatePollModal from '@/components/modals/CreatePollModal';
 import UpdatePollModal from '@/components/modals/UpdatePollModal';
 import DeletePollModal from '@/components/modals/DeletePollModal';
-import RoleBasedRoute from '@/components/shared/RoleBasedRoute';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -46,8 +45,7 @@ const AdminDashboard = () => {
   });
 
   return (
-    <RoleBasedRoute role="admin">
-      <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -165,12 +163,10 @@ const AdminDashboard = () => {
       </main>
 
       {/* Modals */}
-        {/* Modals */}
-        <CreatePollModal />
-        <UpdatePollModal />
-        <DeletePollModal />
-      </div>
-    </RoleBasedRoute>
+      <CreatePollModal />
+      <UpdatePollModal />
+      <DeletePollModal />
+    </div>
   );
 };
 

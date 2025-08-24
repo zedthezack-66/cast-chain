@@ -25,8 +25,8 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/polls/:id" element={<PollDetails />} />
-        <Route path="/voter/*" element={<VoterDashboard />} />
-        <Route path="/admin/*" element={<AdminDashboard />} />
+        <Route path="/voter-dashboard" element={<VoterDashboard />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

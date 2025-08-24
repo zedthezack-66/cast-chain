@@ -14,14 +14,8 @@ const Index = () => {
   const [authRole, setAuthRole] = useState<'voter' | 'admin'>('voter');
 
   const handleRoleSelect = (role: 'voter' | 'admin') => {
-    if (role === 'admin') {
-      // Admin goes directly to admin dashboard - auto-connect handled by RoleBasedRoute
-      navigate('/admin');
-    } else {
-      // Voter goes to biometric auth for wallet selection
-      setAuthRole(role);
-      setShowAuth(true);
-    }
+    setAuthRole(role);
+    setShowAuth(true);
   };
 
   const handleAuthComplete = () => {
@@ -31,12 +25,10 @@ const Index = () => {
 
   if (showAuth) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <BiometricAuth
-          role={authRole}
-          onAuth={handleAuthComplete}
-        />
-      </div>
+      <BiometricAuth
+        role={authRole}
+        onAuth={handleAuthComplete}
+      />
     );
   }
 
@@ -67,7 +59,7 @@ const Index = () => {
 
             {/* Role Selection Cards */}
             <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto mb-16">
-              <Card className="poll-card group cursor-pointer" onClick={() => navigate('/voter')}>
+              <Card className="poll-card group cursor-pointer" onClick={() => handleRoleSelect('voter')}>
                 <CardContent className="p-8 text-center">
                   <div className="gradient-primary p-4 rounded-full w-16 h-16 mx-auto mb-4">
                     <Users className="w-8 h-8 text-primary-foreground" />
@@ -80,7 +72,7 @@ const Index = () => {
                 </CardContent>
               </Card>
 
-              <Card className="poll-card group cursor-pointer" onClick={() => navigate('/admin')}>
+              <Card className="poll-card group cursor-pointer" onClick={() => handleRoleSelect('admin')}>
                 <CardContent className="p-8 text-center">
                   <div className="gradient-secondary p-4 rounded-full w-16 h-16 mx-auto mb-4">
                     <Shield className="w-8 h-8 text-primary-foreground" />
