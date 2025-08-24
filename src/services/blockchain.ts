@@ -52,6 +52,50 @@ export const isMetaMaskInstalled = (): boolean => {
   return typeof window !== 'undefined' && window.ethereum && window.ethereum.isMetaMask;
 };
 
+// Connect to first Hardhat account (for admin)
+export const connectAdminWallet = async (): Promise<void> => {
+  if (!isMetaMaskInstalled()) {
+    throw new Error('MetaMask is not installed');
+  }
+
+  try {
+    store.dispatch(setConnecting(true));
+    await initializeProvider();
+
+    if (!provider) throw new Error('Provider not initialized');
+
+    // Get all accounts and use the first one (admin account)
+    const accounts = await provider.send('eth_accounts', []);
+    if (accounts.length === 0) {
+      // If no accounts are connected, request access first
+      await provider.send('eth_requestAccounts', []);
+      const newAccounts = await provider.send('eth_accounts', []);
+      if (newAccounts.length === 0) {
+        throw new Error('No accounts found');
+      }
+    }
+    
+    const network = await provider.getNetwork();
+    const chainId = Number(network.chainId);
+
+    // Always use the first account for admin
+    const adminAccount = accounts.length > 0 ? accounts[0] : (await provider.send('eth_accounts', []))[0];
+
+    store.dispatch(setWalletConnected({
+      account: adminAccount,
+      chainId
+    }));
+
+    // Check if we're on the correct network
+    if (chainId !== HARDHAT_CHAIN_ID) {
+      await switchToHardhatNetwork();
+    }
+  } catch (error: any) {
+    store.dispatch(setWalletDisconnected());
+    throw new Error(error.message || 'Failed to connect admin wallet');
+  }
+};
+
 // Connect wallet
 export const connectWallet = async (): Promise<void> => {
   if (!isMetaMaskInstalled()) {

@@ -12,19 +12,21 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { Wallet, ChevronDown, Copy, ExternalLink, LogOut, Zap } from 'lucide-react';
-import { connectWallet, disconnectWallet } from '@/services/blockchain';
+import { connectWallet, disconnectWallet, connectAdminWallet } from '@/services/blockchain';
 import { useToast } from '@/hooks/use-toast';
 
 interface ConnectWalletProps {
   variant?: 'default' | 'hero' | 'minimal';
   size?: 'sm' | 'default' | 'lg';
   className?: string;
+  isAdmin?: boolean;
 }
 
 export const ConnectWallet = ({ 
   variant = 'default', 
   size = 'default',
   className = '' 
+  isAdmin = false
 }: ConnectWalletProps) => {
   const { toast } = useToast();
   const dispatch = useDispatch();
@@ -34,7 +36,11 @@ export const ConnectWallet = ({
   const handleConnect = async () => {
     setIsConnecting(true);
     try {
-      await connectWallet();
+      if (isAdmin) {
+        await connectAdminWallet();
+      } else {
+        await connectWallet();
+      }
       toast({
         title: "Wallet Connected",
         description: "Successfully connected to MetaMask",
@@ -119,7 +125,7 @@ export const ConnectWallet = ({
         className={`${getVariantStyles()} ${getSizeStyles()} ${className}`}
       >
         <Wallet className="w-4 h-4 mr-2" />
-        {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+        {isConnecting ? 'Connecting...' : isAdmin ? 'Connect Admin Wallet' : 'Connect Wallet'}
       </Button>
     );
   }

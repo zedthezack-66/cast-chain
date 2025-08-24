@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { Users, Image as ImageIcon, User } from 'lucide-react';
 import { RootState } from '@/store';
 import { closeContest } from '@/store/slices/modalsSlice';
@@ -14,6 +15,7 @@ const AddContestantModal = () => {
   const dispatch = useDispatch();
   const { toast } = useToast();
   const { contest: isOpen, selectedPollId } = useSelector((state: RootState) => state.modals);
+  const location = useLocation();
   const { polls } = useSelector((state: RootState) => state.polls);
   const { loading: txLoading } = useSelector((state: RootState) => state.transaction);
   const { account } = useSelector((state: RootState) => state.wallet);
@@ -31,11 +33,21 @@ const AddContestantModal = () => {
     
     if (!selectedPollId) return;
 
-    // Check if user is poll director (admin)
+    // Check if user is poll director and on admin page
+    const isAdminPage = location.pathname.includes('admin');
     if (!account || !selectedPoll || selectedPoll.director.toLowerCase() !== account.toLowerCase()) {
       toast({
         title: "Access Denied",
         description: "Only the poll director can add contestants",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isAdminPage) {
+      toast({
+        title: "Access Denied",
+        description: "Adding contestants is only available on the admin page",
         variant: "destructive",
       });
       return;

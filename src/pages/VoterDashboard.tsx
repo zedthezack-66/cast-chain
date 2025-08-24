@@ -1,15 +1,29 @@
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
 import { RootState } from '@/store';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Vote, Users, Zap, Clock } from 'lucide-react';
 import { ConnectWallet } from '@/components/shared/ConnectWallet';
 import { PollGrid } from '@/components/polls/PollGrid';
 import { VotingStatsCards } from '@/components/stats/VotingStatsCards';
+import { disconnectWallet } from '@/services/blockchain';
 
 const VoterDashboard = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { account } = useSelector((state: RootState) => state.wallet);
+
+  // Disconnect any existing connection when entering voter dashboard
+  useEffect(() => {
+    // Disconnect wallet to ensure fresh connection for voter
+    disconnectWallet();
+    
+    // Cleanup on unmount
+    return () => {
+      // Optional: disconnect on unmount if needed
+    };
+  }, []);
 
   // Mock stats - in real app this would come from user's voting data
   const voterStats = {

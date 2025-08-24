@@ -8,7 +8,7 @@ import { openCreatePoll } from '@/store/slices/modalsSlice';
 import { ConnectWallet } from '@/components/shared/ConnectWallet';
 import { PollGrid } from '@/components/polls/PollGrid';
 import { VotingStatsCards } from '@/components/stats/VotingStatsCards';
-import { getRealPlatformStats } from '@/services/blockchain';
+import { getRealPlatformStats, connectAdminWallet, disconnectWallet } from '@/services/blockchain';
 import CreatePollModal from '@/components/modals/CreatePollModal';
 import UpdatePollModal from '@/components/modals/UpdatePollModal';
 import DeletePollModal from '@/components/modals/DeletePollModal';
@@ -17,6 +17,27 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { account } = useSelector((state: RootState) => state.wallet);
+
+  // Auto-connect to first Hardhat account on component mount
+  useEffect(() => {
+    const autoConnectAdmin = async () => {
+      try {
+        // Disconnect any existing connection first
+        disconnectWallet();
+        // Small delay to ensure state is cleared
+        setTimeout(async () => {
+          await connectAdminWallet();
+        }, 100);
+      } catch (error) {
+        console.error('Failed to auto-connect admin wallet:', error);
+      }
+    };
+
+    autoConnectAdmin();
+    
+    // Cleanup on unmount
+    return () => disconnectWallet();
+  }, []);
 
   const handleCreatePoll = () => {
     dispatch(openCreatePoll());
@@ -72,7 +93,11 @@ const AdminDashboard = () => {
             </div>
             
             <div className="flex items-center gap-3">
-              <ConnectWallet />
+              {account && (
+                <div className="text-sm text-muted-foreground">
+                  Admin: {account.slice(0, 6)}...{account.slice(-4)}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -90,9 +115,8 @@ const AdminDashboard = () => {
                 <Shield className="w-16 h-16 text-secondary mx-auto mb-6 blockchain-pulse" />
                 <h2 className="text-2xl font-bold mb-4">Admin Access Required</h2>
                 <p className="text-muted-foreground mb-8">
-                  Connect your wallet to access the administrative dashboard and manage polls
+                  Connecting to admin wallet automatically...
                 </p>
-                <ConnectWallet variant="hero" className="w-full" />
               </div>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { RootState } from '@/store';
 import { loadPolls } from '@/services/blockchain';
 import { PollCard } from './PollCard';
@@ -15,8 +16,15 @@ interface PollGridProps {
 
 export const PollGrid = ({ showAdminActions = false, className = '' }: PollGridProps) => {
   const { polls, loading } = useSelector((state: RootState) => state.polls);
+  const { account } = useSelector((state: RootState) => state.wallet);
+  const location = useLocation();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  
+  // Check if we're on admin page and if current account is admin (first account)
+  const isAdminPage = location.pathname.includes('admin');
+  const isAdminAccount = isAdminPage; // Since admin page auto-connects to first account
+  const shouldShowAdminActions = showAdminActions && isAdminAccount;
 
   useEffect(() => {
     loadPolls();
@@ -135,7 +143,7 @@ export const PollGrid = ({ showAdminActions = false, className = '' }: PollGridP
           <div key={poll.id} className={`animate-stagger stagger-${Math.min(index + 3, 6)}`}>
             <PollCard 
               poll={poll} 
-              showAdminActions={showAdminActions}
+              showAdminActions={shouldShowAdminActions}
             />
           </div>
         ))}

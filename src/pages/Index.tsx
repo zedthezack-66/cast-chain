@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { disconnectWallet } from '@/services/blockchain';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Users, Shield, Fingerprint } from 'lucide-react';
@@ -14,6 +15,9 @@ const Index = () => {
   const [authRole, setAuthRole] = useState<'voter' | 'admin'>('voter');
 
   const handleRoleSelect = (role: 'voter' | 'admin') => {
+    // Disconnect any existing wallet connection when switching roles
+    disconnectWallet();
+    
     setAuthRole(role);
     setShowAuth(true);
   };

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { Users, Vote, Crown, Trophy } from 'lucide-react';
 import { RootState } from '@/store';
 import { ContestantStruct } from '@/utils/types';
@@ -19,6 +20,7 @@ interface ContestantsListProps {
 const ContestantsList = ({ pollId, contestants, isActive }: ContestantsListProps) => {
   const { toast } = useToast();
   const { account } = useSelector((state: RootState) => state.wallet);
+  const location = useLocation();
   const { loading: txLoading } = useSelector((state: RootState) => state.transaction);
   const [hasVoted, setHasVoted] = useState(false);
   const [votingFor, setVotingFor] = useState<number | null>(null);
@@ -32,12 +34,25 @@ const ContestantsList = ({ pollId, contestants, isActive }: ContestantsListProps
     };
     checkVoteStatus();
   }, [account, pollId]);
+  
+  // Check if we're on voter page - only voters can vote
+  const isVoterPage = location.pathname.includes('voter') || location.pathname === '/';
+  const canVote = isVoterPage && isActive && account && !hasVoted;
 
   const handleVote = async (contestantId: number) => {
     if (!account) {
       toast({
         title: "Wallet Not Connected",
         description: "Please connect your wallet to vote",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isVoterPage) {
+      toast({
+        title: "Access Denied",
+        description: "Voting is only available on the voter page",
         variant: "destructive",
       });
       return;
@@ -103,7 +118,7 @@ const ContestantsList = ({ pollId, contestants, isActive }: ContestantsListProps
         {sortedContestants.map((contestant, index) => {
           const votePercentage = totalVotes > 0 ? (contestant.votes / totalVotes) * 100 : 0;
           const isWinner = index === 0 && contestant.votes > 0;
-          const canVote = isActive && account && !hasVoted;
+          const showVoteButton = canVote;
           const isVoting = votingFor === contestant.id;
 
           return (
@@ -158,7 +173,7 @@ const ContestantsList = ({ pollId, contestants, isActive }: ContestantsListProps
                     <Progress value={votePercentage} className="mb-4" />
 
                     {/* Vote Button */}
-                    {canVote && (
+                    {showVoteButton && (
                       <Button
                         onClick={() => handleVote(contestant.id)}
                         disabled={isVoting || txLoading}
@@ -174,7 +189,7 @@ const ContestantsList = ({ pollId, contestants, isActive }: ContestantsListProps
                       </div>
                     )}
 
-                    {!isActive && (
+                    {!isActive && isVoterPage && (
                       <div className="text-center py-2">
                         <Badge variant="outline">Voting period ended</Badge>
                       </div>

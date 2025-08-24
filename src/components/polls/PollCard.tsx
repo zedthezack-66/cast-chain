@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Vote, Users, Clock, Calendar, Zap } from 'lucide-react';
 import { PollStruct } from '@/utils/types';
+import { RootState } from '@/store';
 
 interface PollCardProps {
   poll: PollStruct;
@@ -12,6 +14,8 @@ interface PollCardProps {
 }
 
 export const PollCard = ({ poll, showAdminActions = false, className = '' }: PollCardProps) => {
+  const { account } = useSelector((state: RootState) => state.wallet);
+  
   const now = Math.floor(Date.now() / 1000);
   const isActive = now >= poll.startsAt && now <= poll.endsAt && !poll.deleted;
   const hasEnded = now > poll.endsAt;
@@ -27,6 +31,10 @@ export const PollCard = ({ poll, showAdminActions = false, className = '' }: Pol
   const status = getStatusInfo();
   const timeRemaining = isActive ? poll.endsAt - now : poll.startsAt - now;
   const daysRemaining = Math.ceil(timeRemaining / (24 * 60 * 60));
+  
+  // Only show admin actions if user is the poll director and on admin page
+  const canShowAdminActions = showAdminActions && account && 
+    poll.director.toLowerCase() === account.toLowerCase();
 
   return (
     <Card className={`poll-card group ${className}`}>
