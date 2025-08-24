@@ -25,7 +25,7 @@ interface ConnectWalletProps {
 export const ConnectWallet = ({ 
   variant = 'default', 
   size = 'default',
-  className = '' 
+  className = '',
   isAdmin = false
 }: ConnectWalletProps) => {
   const { toast } = useToast();

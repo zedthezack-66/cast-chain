@@ -15,7 +15,11 @@ import { useEffect } from 'react';
 
 const queryClient = new QueryClient();
 
+import { useRouteBasedWallet } from '@/hooks/useRouteBasedWallet';
+
 const AppContent = () => {
+  useRouteBasedWallet(); // Handle route-based wallet management
+  
   useEffect(() => {
     setupEventListeners();
   }, []);

@@ -8,7 +8,7 @@ import { openCreatePoll } from '@/store/slices/modalsSlice';
 import { ConnectWallet } from '@/components/shared/ConnectWallet';
 import { PollGrid } from '@/components/polls/PollGrid';
 import { VotingStatsCards } from '@/components/stats/VotingStatsCards';
-import { getRealPlatformStats, connectAdminWallet, disconnectWallet } from '@/services/blockchain';
+import { getRealPlatformStats } from '@/services/blockchain';
 import CreatePollModal from '@/components/modals/CreatePollModal';
 import UpdatePollModal from '@/components/modals/UpdatePollModal';
 import DeletePollModal from '@/components/modals/DeletePollModal';
@@ -17,27 +17,6 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { account } = useSelector((state: RootState) => state.wallet);
-
-  // Auto-connect to first Hardhat account on component mount
-  useEffect(() => {
-    const autoConnectAdmin = async () => {
-      try {
-        // Disconnect any existing connection first
-        disconnectWallet();
-        // Small delay to ensure state is cleared
-        setTimeout(async () => {
-          await connectAdminWallet();
-        }, 100);
-      } catch (error) {
-        console.error('Failed to auto-connect admin wallet:', error);
-      }
-    };
-
-    autoConnectAdmin();
-    
-    // Cleanup on unmount
-    return () => disconnectWallet();
-  }, []);
 
   const handleCreatePoll = () => {
     dispatch(openCreatePoll());

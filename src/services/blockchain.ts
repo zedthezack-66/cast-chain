@@ -52,7 +52,7 @@ export const isMetaMaskInstalled = (): boolean => {
   return typeof window !== 'undefined' && window.ethereum && window.ethereum.isMetaMask;
 };
 
-// Connect to first Hardhat account (for admin)
+// Connect to first Hardhat account (for admin - auto-connects to first deployed account)
 export const connectAdminWallet = async (): Promise<void> => {
   if (!isMetaMaskInstalled()) {
     throw new Error('MetaMask is not installed');
@@ -64,22 +64,20 @@ export const connectAdminWallet = async (): Promise<void> => {
 
     if (!provider) throw new Error('Provider not initialized');
 
-    // Get all accounts and use the first one (admin account)
+    // Ensure we have access to accounts first
+    await provider.send('eth_requestAccounts', []);
+    
+    // Get all accounts from MetaMask
     const accounts = await provider.send('eth_accounts', []);
     if (accounts.length === 0) {
-      // If no accounts are connected, request access first
-      await provider.send('eth_requestAccounts', []);
-      const newAccounts = await provider.send('eth_accounts', []);
-      if (newAccounts.length === 0) {
-        throw new Error('No accounts found');
-      }
+      throw new Error('No accounts found in MetaMask');
     }
     
     const network = await provider.getNetwork();
     const chainId = Number(network.chainId);
 
-    // Always use the first account for admin
-    const adminAccount = accounts.length > 0 ? accounts[0] : (await provider.send('eth_accounts', []))[0];
+    // Always use the first account (first deployed account from Hardhat)
+    const adminAccount = accounts[0];
 
     store.dispatch(setWalletConnected({
       account: adminAccount,
@@ -96,7 +94,7 @@ export const connectAdminWallet = async (): Promise<void> => {
   }
 };
 
-// Connect wallet
+// Connect wallet (for voters - allows account selection)
 export const connectWallet = async (): Promise<void> => {
   if (!isMetaMaskInstalled()) {
     throw new Error('MetaMask is not installed');
@@ -108,7 +106,14 @@ export const connectWallet = async (): Promise<void> => {
 
     if (!provider) throw new Error('Provider not initialized');
 
-    // Request permissions to show account selection dialog
+    // First revoke existing permissions to force account selection
+    try {
+      await provider.send('wallet_revokePermissions', [{ eth_accounts: {} }]);
+    } catch (error) {
+      // Ignore if revokePermissions is not supported
+    }
+
+    // Request fresh permissions to show account selection dialog
     await provider.send('wallet_requestPermissions', [{ eth_accounts: {} }]);
     
     const accounts = await provider.send('eth_requestAccounts', []);

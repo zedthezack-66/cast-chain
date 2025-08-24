@@ -7,23 +7,21 @@ import { ArrowLeft, Vote, Users, Zap, Clock } from 'lucide-react';
 import { ConnectWallet } from '@/components/shared/ConnectWallet';
 import { PollGrid } from '@/components/polls/PollGrid';
 import { VotingStatsCards } from '@/components/stats/VotingStatsCards';
-import { disconnectWallet } from '@/services/blockchain';
+import BiometricAuth from '@/components/BiometricAuth';
+import { connectWallet } from '@/services/blockchain';
 
 const VoterDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { account } = useSelector((state: RootState) => state.wallet);
 
-  // Disconnect any existing connection when entering voter dashboard
-  useEffect(() => {
-    // Disconnect wallet to ensure fresh connection for voter
-    disconnectWallet();
-    
-    // Cleanup on unmount
-    return () => {
-      // Optional: disconnect on unmount if needed
-    };
-  }, []);
+  const handleBiometricAuth = async () => {
+    try {
+      await connectWallet(); // This will trigger MetaMask account selection
+    } catch (error) {
+      console.error('Failed to connect wallet after biometric auth:', error);
+    }
+  };
 
   // Mock stats - in real app this would come from user's voting data
   const voterStats = {
@@ -73,13 +71,8 @@ const VoterDashboard = () => {
               <div className="floating-orb w-32 h-32 -top-16 -left-16" />
               <div className="floating-orb w-24 h-24 -bottom-12 -right-12" />
               
-              <div className="relative glass-card p-8 rounded-xl">
-                <Zap className="w-16 h-16 text-primary mx-auto mb-6 blockchain-pulse" />
-                <h2 className="text-2xl font-bold mb-4">Connect Your Wallet</h2>
-                <p className="text-muted-foreground mb-8">
-                  Connect your MetaMask wallet to start voting on secure blockchain polls
-                </p>
-                <ConnectWallet variant="hero" className="w-full" />
+              <div className="relative">
+                <BiometricAuth role="voter" onAuth={handleBiometricAuth} />
               </div>
             </div>
           </div>
