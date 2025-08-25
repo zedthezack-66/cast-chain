@@ -81,7 +81,8 @@ export const connectAdminWallet = async (): Promise<void> => {
 
     store.dispatch(setWalletConnected({
       account: adminAccount,
-      chainId
+      chainId,
+      isAdmin: true
     }));
 
     // Check if we're on the correct network
@@ -126,7 +127,8 @@ export const connectWallet = async (): Promise<void> => {
 
     store.dispatch(setWalletConnected({
       account: accounts[0],
-      chainId
+      chainId,
+      isAdmin: false
     }));
 
     // Check if we're on the correct network

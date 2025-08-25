@@ -1,12 +1,26 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ModalsState } from '@/utils/types';
+import { PollStruct, ContestantStruct } from '@/utils/types';
+
+interface ModalsState {
+  createPoll: boolean;
+  updatePoll: boolean;
+  deletePoll: boolean;
+  addContestant: boolean;
+  updateContestant: boolean;
+  deleteContestant: boolean;
+  selectedPoll: PollStruct | null;
+  selectedContestant: ContestantStruct | null;
+}
 
 const initialState: ModalsState = {
   createPoll: false,
   updatePoll: false,
   deletePoll: false,
-  contest: false,
-  selectedPollId: null,
+  addContestant: false,
+  updateContestant: false,
+  deleteContestant: false,
+  selectedPoll: null,
+  selectedContestant: null,
 };
 
 const modalsSlice = createSlice({
@@ -19,36 +33,45 @@ const modalsSlice = createSlice({
     closeCreatePoll: (state) => {
       state.createPoll = false;
     },
-    openUpdatePoll: (state, action: PayloadAction<number>) => {
+    openUpdatePoll: (state, action: PayloadAction<PollStruct>) => {
       state.updatePoll = true;
-      state.selectedPollId = action.payload;
+      state.selectedPoll = action.payload;
     },
     closeUpdatePoll: (state) => {
       state.updatePoll = false;
-      state.selectedPollId = null;
+      state.selectedPoll = null;
     },
-    openDeletePoll: (state, action: PayloadAction<number>) => {
+    openDeletePoll: (state, action: PayloadAction<PollStruct>) => {
       state.deletePoll = true;
-      state.selectedPollId = action.payload;
+      state.selectedPoll = action.payload;
     },
     closeDeletePoll: (state) => {
       state.deletePoll = false;
-      state.selectedPollId = null;
+      state.selectedPoll = null;
     },
-    openContest: (state, action: PayloadAction<number>) => {
-      state.contest = true;
-      state.selectedPollId = action.payload;
+    openAddContestant: (state, action: PayloadAction<PollStruct>) => {
+      state.addContestant = true;
+      state.selectedPoll = action.payload;
     },
-    closeContest: (state) => {
-      state.contest = false;
-      state.selectedPollId = null;
+    closeAddContestant: (state) => {
+      state.addContestant = false;
+      state.selectedPoll = null;
     },
-    closeAllModals: (state) => {
-      state.createPoll = false;
-      state.updatePoll = false;
-      state.deletePoll = false;
-      state.contest = false;
-      state.selectedPollId = null;
+    openUpdateContestant: (state, action: PayloadAction<ContestantStruct>) => {
+      state.updateContestant = true;
+      state.selectedContestant = action.payload;
+    },
+    closeUpdateContestant: (state) => {
+      state.updateContestant = false;
+      state.selectedContestant = null;
+    },
+    openDeleteContestant: (state, action: PayloadAction<ContestantStruct>) => {
+      state.deleteContestant = true;
+      state.selectedContestant = action.payload;
+    },
+    closeDeleteContestant: (state) => {
+      state.deleteContestant = false;
+      state.selectedContestant = null;
     },
   },
 });
@@ -60,9 +83,12 @@ export const {
   closeUpdatePoll,
   openDeletePoll,
   closeDeletePoll,
-  openContest,
-  closeContest,
-  closeAllModals,
+  openAddContestant,
+  closeAddContestant,
+  openUpdateContestant,
+  closeUpdateContestant,
+  openDeleteContestant,
+  closeDeleteContestant,
 } = modalsSlice.actions;
 
 export default modalsSlice.reducer;

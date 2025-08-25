@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Shield, Plus, Settings, BarChart3, Users, Zap, TrendingUp } from 'lucide-react';
 import { openCreatePoll } from '@/store/slices/modalsSlice';
 import { ConnectWallet } from '@/components/shared/ConnectWallet';
+import { AccessControl } from '@/components/shared/AccessControl';
 import { PollGrid } from '@/components/polls/PollGrid';
 import { VotingStatsCards } from '@/components/stats/VotingStatsCards';
 import { getRealPlatformStats } from '@/services/blockchain';
@@ -16,7 +17,7 @@ import DeletePollModal from '@/components/modals/DeletePollModal';
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { account } = useSelector((state: RootState) => state.wallet);
+  const { account, isAdmin } = useSelector((state: RootState) => state.wallet);
 
   const handleCreatePoll = () => {
     dispatch(openCreatePoll());
@@ -45,7 +46,8 @@ const AdminDashboard = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <AccessControl requireAdmin={true}>
+      <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -72,9 +74,19 @@ const AdminDashboard = () => {
             </div>
             
             <div className="flex items-center gap-3">
-              {account && (
+              {account && isAdmin ? (
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                    <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                    <span className="text-sm font-medium">Admin Connected</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground font-mono">
+                    {account.slice(0, 6)}...{account.slice(-4)}
+                  </div>
+                </div>
+              ) : (
                 <div className="text-sm text-muted-foreground">
-                  Admin: {account.slice(0, 6)}...{account.slice(-4)}
+                  Connecting to admin wallet...
                 </div>
               )}
             </div>
@@ -82,25 +94,8 @@ const AdminDashboard = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        {!account ? (
-          /* Not Connected State */
-          <div className="min-h-[60vh] flex items-center justify-center">
-            <div className="text-center max-w-md mx-auto">
-              <div className="floating-orb w-32 h-32 -top-16 -left-16" />
-              <div className="floating-orb w-24 h-24 -bottom-12 -right-12" />
-              
-              <div className="relative glass-card p-8 rounded-xl">
-                <Shield className="w-16 h-16 text-secondary mx-auto mb-6 blockchain-pulse" />
-                <h2 className="text-2xl font-bold mb-4">Admin Access Required</h2>
-                <p className="text-muted-foreground mb-8">
-                  Connecting to admin wallet automatically...
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          /* Connected State */
+        <main className="container mx-auto px-4 py-8">
+          {/* Connected State */}
           <div className="space-y-8">
             {/* Welcome Section */}
             <section className="animate-stagger stagger-1">
@@ -162,14 +157,14 @@ const AdminDashboard = () => {
               <PollGrid showAdminActions={true} />
             </section>
           </div>
-        )}
-      </main>
+        </main>
 
-      {/* Modals */}
-      <CreatePollModal />
-      <UpdatePollModal />
-      <DeletePollModal />
-    </div>
+        {/* Modals */}
+        <CreatePollModal />
+        <UpdatePollModal />
+        <DeletePollModal />
+      </div>
+    </AccessControl>
   );
 };
 

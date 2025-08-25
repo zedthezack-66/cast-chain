@@ -6,38 +6,46 @@ import { connectAdminWallet, disconnectWallet } from '@/services/blockchain';
 
 export const useRouteBasedWallet = () => {
   const location = useLocation();
-  const { account } = useSelector((state: RootState) => state.wallet);
+  const { account, isAdmin } = useSelector((state: RootState) => state.wallet);
 
   useEffect(() => {
     const currentPath = location.pathname;
+    const lastRoute = sessionStorage.getItem('lastRoute');
 
-    // Handle admin routes
-    if (currentPath === '/admin-dashboard') {
-      const autoConnectAdmin = async () => {
-        try {
-          // Disconnect any existing connection first
-          disconnectWallet();
-          // Small delay to ensure state is cleared
-          setTimeout(async () => {
-            await connectAdminWallet();
-          }, 100);
-        } catch (error) {
-          console.error('Failed to auto-connect admin wallet:', error);
-        }
-      };
+    // Handle admin routes - auto-connect if not connected or wrong role
+    if (currentPath.startsWith('/admin')) {
+      if (!account || !isAdmin) {
+        const autoConnectAdmin = async () => {
+          try {
+            // Disconnect any existing non-admin connection
+            if (account && !isAdmin) {
+              disconnectWallet();
+              // Small delay to ensure state is cleared
+              await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            if (!account) {
+              await connectAdminWallet();
+            }
+          } catch (error) {
+            console.error('Failed to auto-connect admin wallet:', error);
+          }
+        };
 
-      autoConnectAdmin();
+        autoConnectAdmin();
+      }
     }
-    // Handle voter routes - disconnect existing connections to allow fresh selection
-    else if (currentPath === '/voter-dashboard') {
-      // Disconnect any existing wallet to ensure fresh connection
-      disconnectWallet();
+    // Handle voter routes - allow manual connection, disconnect if admin
+    else if (currentPath.startsWith('/voter')) {
+      if (account && isAdmin) {
+        // Disconnect admin when entering voter section
+        disconnectWallet();
+      }
     }
-    // Handle leaving admin/voter routes - disconnect wallet
-    else if (account && (currentPath === '/' || currentPath.startsWith('/polls/'))) {
+    // Handle leaving admin/voter contexts completely
+    else if (currentPath === '/' || (!currentPath.startsWith('/admin') && !currentPath.startsWith('/voter'))) {
       // Only disconnect if coming from admin/voter routes
-      const wasOnAdminOrVoter = sessionStorage.getItem('lastRoute');
-      if (wasOnAdminOrVoter === '/admin-dashboard' || wasOnAdminOrVoter === '/voter-dashboard') {
+      if (lastRoute?.startsWith('/admin') || lastRoute?.startsWith('/voter')) {
         disconnectWallet();
       }
     }
@@ -47,16 +55,15 @@ export const useRouteBasedWallet = () => {
 
     // Cleanup function when component unmounts or route changes
     return () => {
-      // Don't disconnect on route change within same role context
       const nextPath = window.location.pathname;
-      const isLeavingAdminContext = currentPath === '/admin-dashboard' && nextPath !== '/admin-dashboard';
-      const isLeavingVoterContext = currentPath === '/voter-dashboard' && nextPath !== '/voter-dashboard';
+      const isLeavingAdminContext = currentPath.startsWith('/admin') && !nextPath.startsWith('/admin');
+      const isLeavingVoterContext = currentPath.startsWith('/voter') && !nextPath.startsWith('/voter');
       
       if (isLeavingAdminContext || isLeavingVoterContext) {
         disconnectWallet();
       }
     };
-  }, [location.pathname, account]);
+  }, [location.pathname, account, isAdmin]);
 
   return null;
 };

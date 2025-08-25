@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Plus, Calendar, Image as ImageIcon, FileText, Clock } from 'lucide-react';
+import { Plus, Calendar, Image as ImageIcon, FileText, Clock, AlertCircle } from 'lucide-react';
 import { RootState } from '@/store';
 import { closeCreatePoll } from '@/store/slices/modalsSlice';
 import { createPoll } from '@/services/blockchain';
+import { getContestantCount } from '@/services/candidateManagement';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 
 const CreatePollModal = () => {
@@ -16,6 +18,7 @@ const CreatePollModal = () => {
   const { toast } = useToast();
   const { createPoll: isOpen } = useSelector((state: RootState) => state.modals);
   const { loading: txLoading } = useSelector((state: RootState) => state.transaction);
+  const { account, isAdmin } = useSelector((state: RootState) => state.wallet);
 
   const [formData, setFormData] = useState({
     image: '',
@@ -27,6 +30,16 @@ const CreatePollModal = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check admin access
+    if (!account || !isAdmin) {
+      toast({
+        title: "Access Denied",
+        description: "Admin access required to create polls",
+        variant: "destructive",
+      });
+      return;
+    }
     
     const startTime = new Date(formData.startTime);
     const endTime = new Date(formData.endTime);
@@ -51,7 +64,7 @@ const CreatePollModal = () => {
 
       toast({
         title: "Poll Created",
-        description: "Your poll has been created successfully",
+        description: "Your poll has been created successfully. Remember to add at least 2 candidates before activation.",
       });
 
       setFormData({ image: '', title: '', description: '', startTime: '', endTime: '' });
@@ -76,6 +89,13 @@ const CreatePollModal = () => {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Remember: You must add at least 2 candidates to your poll before voters can participate.
+            </AlertDescription>
+          </Alert>
+          
           <div className="space-y-2">
             <Label htmlFor="image">Banner Image URL</Label>
             <Input

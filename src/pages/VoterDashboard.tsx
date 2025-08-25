@@ -1,19 +1,26 @@
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { RootState } from '@/store';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Vote, Users, Zap, Clock } from 'lucide-react';
 import { ConnectWallet } from '@/components/shared/ConnectWallet';
+import { AccessControl } from '@/components/shared/AccessControl';
 import { PollGrid } from '@/components/polls/PollGrid';
 import { VotingStatsCards } from '@/components/stats/VotingStatsCards';
 import BiometricAuth from '@/components/BiometricAuth';
-import { connectWallet } from '@/services/blockchain';
+import { connectWallet, getRealPlatformStats } from '@/services/blockchain';
 
 const VoterDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { account } = useSelector((state: RootState) => state.wallet);
+  const { account, isAdmin } = useSelector((state: RootState) => state.wallet);
+  const [voterStats, setVoterStats] = useState({
+    activePolls: 0,
+    totalVotes: 0,
+    totalVoters: 0,
+    verificationRate: 100
+  });
 
   const handleBiometricAuth = async () => {
     try {
@@ -23,13 +30,26 @@ const VoterDashboard = () => {
     }
   };
 
-  // Mock stats - in real app this would come from user's voting data
-  const voterStats = {
-    activePolls: 8,
-    totalVotes: 14,
-    totalVoters: 2847,
-    verificationRate: 100
-  };
+  // Load real voter stats
+  useEffect(() => {
+    const loadStats = async () => {
+      const stats = await getRealPlatformStats();
+      setVoterStats(stats);
+    };
+    
+    if (account && !isAdmin) {
+      loadStats();
+      // Refresh stats every 30 seconds
+      const interval = setInterval(loadStats, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [account, isAdmin]);
+
+  // Redirect admin users
+  if (account && isAdmin) {
+    navigate('/admin');
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -58,7 +78,7 @@ const VoterDashboard = () => {
               </div>
             </div>
             
-            <ConnectWallet />
+            <ConnectWallet variant="default" />
           </div>
         </div>
       </header>
@@ -124,7 +144,7 @@ const VoterDashboard = () => {
                   </div>
                 </div>
               </div>
-              <PollGrid />
+              <PollGrid showAdminActions={false} />
             </section>
           </div>
         )}
