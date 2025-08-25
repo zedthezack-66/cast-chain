@@ -83,10 +83,11 @@ const AdminDashboard = () => {
                   <div className="text-sm text-muted-foreground font-mono">
                     {account.slice(0, 6)}...{account.slice(-4)}
                   </div>
-                  <ConnectWallet variant="minimal" isAdmin />
                 </div>
               ) : (
-                <ConnectWallet variant="default" isAdmin />
+                <div className="text-sm text-muted-foreground">
+                  Connecting to admin wallet...
+                </div>
               )}
             </div>
           </div>
