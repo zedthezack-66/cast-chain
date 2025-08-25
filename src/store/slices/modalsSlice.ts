@@ -10,6 +10,9 @@ interface ModalsState {
   deleteContestant: boolean;
   selectedPoll: PollStruct | null;
   selectedContestant: ContestantStruct | null;
+  // Backward compatibility
+  contest: boolean;
+  selectedPollId: number | null;
 }
 
 const initialState: ModalsState = {
@@ -21,6 +24,9 @@ const initialState: ModalsState = {
   deleteContestant: false,
   selectedPoll: null,
   selectedContestant: null,
+  // Backward compatibility
+  contest: false,
+  selectedPollId: null,
 };
 
 const modalsSlice = createSlice({
@@ -33,21 +39,33 @@ const modalsSlice = createSlice({
     closeCreatePoll: (state) => {
       state.createPoll = false;
     },
-    openUpdatePoll: (state, action: PayloadAction<PollStruct>) => {
+    openUpdatePoll: (state, action: PayloadAction<PollStruct | number>) => {
       state.updatePoll = true;
-      state.selectedPoll = action.payload;
+      if (typeof action.payload === 'number') {
+        // Backward compatibility
+        state.selectedPollId = action.payload;
+      } else {
+        state.selectedPoll = action.payload;
+      }
     },
     closeUpdatePoll: (state) => {
       state.updatePoll = false;
       state.selectedPoll = null;
+      state.selectedPollId = null;
     },
-    openDeletePoll: (state, action: PayloadAction<PollStruct>) => {
+    openDeletePoll: (state, action: PayloadAction<PollStruct | number>) => {
       state.deletePoll = true;
-      state.selectedPoll = action.payload;
+      if (typeof action.payload === 'number') {
+        // Backward compatibility
+        state.selectedPollId = action.payload;
+      } else {
+        state.selectedPoll = action.payload;
+      }
     },
     closeDeletePoll: (state) => {
       state.deletePoll = false;
       state.selectedPoll = null;
+      state.selectedPollId = null;
     },
     openAddContestant: (state, action: PayloadAction<PollStruct>) => {
       state.addContestant = true;
@@ -73,6 +91,18 @@ const modalsSlice = createSlice({
       state.deleteContestant = false;
       state.selectedContestant = null;
     },
+    // Backward compatibility functions
+    openContest: (state, action: PayloadAction<number>) => {
+      state.contest = true;
+      state.addContestant = true;
+      state.selectedPollId = action.payload;
+    },
+    closeContest: (state) => {
+      state.contest = false;
+      state.addContestant = false;
+      state.selectedPollId = null;
+      state.selectedPoll = null;
+    },
   },
 });
 
@@ -89,6 +119,9 @@ export const {
   closeUpdateContestant,
   openDeleteContestant,
   closeDeleteContestant,
+  // Backward compatibility exports
+  openContest,
+  closeContest,
 } = modalsSlice.actions;
 
 export default modalsSlice.reducer;

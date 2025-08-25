@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { ArrowLeft, Edit, Trash2, Plus, Users, Clock, Vote } from 'lucide-react';
 import { RootState } from '@/store';
 import { loadPoll, loadContestants } from '@/services/blockchain';
-import { openUpdatePoll, openDeletePoll, openContest } from '@/store/slices/modalsSlice';
+import { openUpdatePoll, openDeletePoll, openAddContestant } from '@/store/slices/modalsSlice';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -89,7 +89,7 @@ const PollDetails = () => {
                   </CardHeader>
                   <CardContent className="flex gap-4">
                     <Button
-                      onClick={() => dispatch(openUpdatePoll(currentPoll.id))}
+                      onClick={() => dispatch(openUpdatePoll(currentPoll))}
                       variant="outline"
                       className="flex-1"
                     >
@@ -97,7 +97,7 @@ const PollDetails = () => {
                       Update Poll
                     </Button>
                     <Button
-                      onClick={() => dispatch(openContest(currentPoll.id))}
+                      onClick={() => dispatch(openAddContestant(currentPoll))}
                       variant="secondary"
                       className="flex-1"
                     >
@@ -105,7 +105,7 @@ const PollDetails = () => {
                       Add Contestant
                     </Button>
                     <Button
-                      onClick={() => dispatch(openDeletePoll(currentPoll.id))}
+                      onClick={() => dispatch(openDeletePoll(currentPoll))}
                       variant="destructive"
                       className="flex-1"
                     >
