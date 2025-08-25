@@ -38,13 +38,17 @@ export const ConnectWallet = ({
     try {
       if (isAdmin) {
         await connectAdminWallet();
+        toast({
+          title: "Admin Wallet Connected",
+          description: "Connected with admin privileges",
+        });
       } else {
         await connectWallet();
+        toast({
+          title: "Wallet Connected",
+          description: "Successfully connected to MetaMask",
+        });
       }
-      toast({
-        title: "Wallet Connected",
-        description: "Successfully connected to MetaMask",
-      });
     } catch (error: any) {
       toast({
         title: "Connection Failed",

@@ -87,12 +87,28 @@ const VoterDashboard = () => {
         {!account ? (
           /* Not Connected State */
           <div className="min-h-[60vh] flex items-center justify-center">
-            <div className="text-center max-w-md mx-auto">
+            <div className="text-center max-w-md mx-auto space-y-8">
               <div className="floating-orb w-32 h-32 -top-16 -left-16" />
               <div className="floating-orb w-24 h-24 -bottom-12 -right-12" />
               
-              <div className="relative">
+              <div className="relative glass-card p-8 rounded-xl animate-float">
+                <div className="mb-6">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full gradient-primary flex items-center justify-center">
+                    <Vote className="h-8 w-8 text-primary-foreground" />
+                  </div>
+                  <h2 className="text-2xl font-bold mb-2">Voter Authentication</h2>
+                  <p className="text-muted-foreground">
+                    Connect your MetaMask wallet to participate in secure blockchain voting
+                  </p>
+                </div>
+                
                 <BiometricAuth role="voter" onAuth={handleBiometricAuth} />
+                
+                <div className="mt-6 text-sm text-muted-foreground">
+                  <p>• Select your preferred MetaMask account</p>
+                  <p>• Vote securely on the blockchain</p>
+                  <p>• Your identity remains private</p>
+                </div>
               </div>
             </div>
           </div>

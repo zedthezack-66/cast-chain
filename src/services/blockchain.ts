@@ -52,7 +52,7 @@ export const isMetaMaskInstalled = (): boolean => {
   return typeof window !== 'undefined' && window.ethereum && window.ethereum.isMetaMask;
 };
 
-// Connect to first Hardhat account (for admin - auto-connects to first deployed account)
+// Connect admin wallet - allows manual selection but reserves first account for admin
 export const connectAdminWallet = async (): Promise<void> => {
   if (!isMetaMaskInstalled()) {
     throw new Error('MetaMask is not installed');
@@ -64,7 +64,7 @@ export const connectAdminWallet = async (): Promise<void> => {
 
     if (!provider) throw new Error('Provider not initialized');
 
-    // Ensure we have access to accounts first
+    // Request account access - this shows MetaMask account selection
     await provider.send('eth_requestAccounts', []);
     
     // Get all accounts from MetaMask
@@ -76,11 +76,11 @@ export const connectAdminWallet = async (): Promise<void> => {
     const network = await provider.getNetwork();
     const chainId = Number(network.chainId);
 
-    // Always use the first account (first deployed account from Hardhat)
-    const adminAccount = accounts[0];
+    // Use the selected account (first account is reserved for admin)
+    const selectedAccount = accounts[0];
 
     store.dispatch(setWalletConnected({
-      account: adminAccount,
+      account: selectedAccount,
       chainId,
       isAdmin: true
     }));
@@ -358,6 +358,11 @@ export const vote = async (data: VoteData): Promise<void> => {
   // Refresh contestants and poll
   await loadContestants(data.pollId);
   await loadPoll(data.pollId);
+  
+  // Auto-disconnect wallet after successful vote
+  setTimeout(() => {
+    disconnectWallet();
+  }, 3000); // 3 second delay to allow user to see success message
 };
 
 // View functions

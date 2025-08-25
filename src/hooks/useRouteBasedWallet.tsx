@@ -12,30 +12,14 @@ export const useRouteBasedWallet = () => {
     const currentPath = location.pathname;
     const lastRoute = sessionStorage.getItem('lastRoute');
 
-    // Handle admin routes - auto-connect if not connected or wrong role
+    // Handle admin routes - disconnect if wrong role, but don't auto-connect
     if (currentPath.startsWith('/admin')) {
-      if (!account || !isAdmin) {
-        const autoConnectAdmin = async () => {
-          try {
-            // Disconnect any existing non-admin connection
-            if (account && !isAdmin) {
-              disconnectWallet();
-              // Small delay to ensure state is cleared
-              await new Promise(resolve => setTimeout(resolve, 100));
-            }
-            
-            if (!account) {
-              await connectAdminWallet();
-            }
-          } catch (error) {
-            console.error('Failed to auto-connect admin wallet:', error);
-          }
-        };
-
-        autoConnectAdmin();
+      if (account && !isAdmin) {
+        // Disconnect non-admin when entering admin section
+        disconnectWallet();
       }
     }
-    // Handle voter routes - allow manual connection, disconnect if admin
+    // Handle voter routes - disconnect if admin
     else if (currentPath.startsWith('/voter')) {
       if (account && isAdmin) {
         // Disconnect admin when entering voter section
@@ -52,18 +36,21 @@ export const useRouteBasedWallet = () => {
 
     // Store current route for next navigation
     sessionStorage.setItem('lastRoute', currentPath);
+  }, [location.pathname, account, isAdmin]);
 
-    // Cleanup function when component unmounts or route changes
+  // Cleanup when leaving routes entirely
+  useEffect(() => {
     return () => {
+      const currentPath = location.pathname;
       const nextPath = window.location.pathname;
-      const isLeavingAdminContext = currentPath.startsWith('/admin') && !nextPath.startsWith('/admin');
-      const isLeavingVoterContext = currentPath.startsWith('/voter') && !nextPath.startsWith('/voter');
       
-      if (isLeavingAdminContext || isLeavingVoterContext) {
+      // Disconnect when leaving admin or voter sections entirely
+      if ((currentPath.startsWith('/admin') && !nextPath.startsWith('/admin')) ||
+          (currentPath.startsWith('/voter') && !nextPath.startsWith('/voter'))) {
         disconnectWallet();
       }
     };
-  }, [location.pathname, account, isAdmin]);
+  }, [location.pathname]);
 
   return null;
 };
